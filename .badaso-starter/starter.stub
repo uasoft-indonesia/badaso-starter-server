@@ -1,0 +1,22 @@
+if command -v composer &> /dev/null;
+then
+    composer create-project laravel/laravel:^8.0 example-app
+    cd example-app
+    if command -v curl &> /dev/null;
+    then
+        curl http://localhost:8000/starter.zip > starter.zip
+        if command -v unzip &> /dev/null;
+        then
+
+        else
+            echo "unzip command not found"
+            exit
+        fi
+    else
+        echo "curl command not found"
+        exit
+    fi
+else
+    echo "composer command not found"
+    exit
+fi
