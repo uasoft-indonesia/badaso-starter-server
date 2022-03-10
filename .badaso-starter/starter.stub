@@ -1,32 +1,41 @@
-if command -v composer &> /dev/null;
+if ! command -v composer &> /dev/null;
 then
-    composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
-    cd {{project-name}}
-    if command -v curl &> /dev/null;
-    then
-        curl http://localhost:8000/starter.zip > starter.zip
-        if command -v unzip &> /dev/null;
-        then
-            composer require badaso/core:^{{badaso-version}}
-            composer require laravel/octane
-            composer require laravel/sail --dev
-            unzip starter.zip
-            mv starter/docker docker
-            mv starter/resources resources
-            mv starter/.env.example.docker .env
-            mv starter/.gitpod.Dockerfile .gitpod.Dockerfile
-            mv starter/.gitpod.yml .gitpod.yml
-            mv starter/docker-compose.yml docker-compose.yml
-            rm -rf starter
-        else
-            echo "unzip command not found"
-            exit
-        fi
-    else
-        echo "curl command not found"
-        exit
-    fi
-else
     echo "composer command not found"
     exit
 fi
+
+if ! command -v curl &> /dev/null;
+then
+    echo "curl command not found"
+    exit
+fi
+
+if ! command -v composer &> /dev/null;
+then
+    echo "composer command not found"
+    exit
+fi
+
+if ! command -v unzip &> /dev/null;
+then
+    echo "unzip command not found"
+    exit
+fi
+
+composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
+cd {{project-name}}
+
+curl {{app_url}}/starter.zip > starter.zip
+
+composer require badaso/core:^{{badaso-version}}
+composer require laravel/octane
+composer require laravel/sail --dev
+
+unzip starter.zip
+mv starter/docker docker
+mv starter/resources resources
+mv starter/.env.example.docker .env
+mv starter/.gitpod.Dockerfile .gitpod.Dockerfile
+mv starter/.gitpod.yml .gitpod.yml
+mv starter/docker-compose.yml docker-compose.yml
+rm -rf starter
