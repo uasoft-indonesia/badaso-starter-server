@@ -16,12 +16,6 @@ then
     exit
 fi
 
-if ! command -v unzip &> /dev/null;
-then
-    echo "unzip command not found"
-    exit
-fi
-
 composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
 
 cd {{project-name}}
@@ -46,3 +40,11 @@ curl {{badaso-starter-url}}/docker-compose.yml > docker-compose.yml
 composer require badaso/core:^{{badaso-version}}
 composer require laravel/octane
 composer require laravel/sail --dev
+
+php artisan badaso:setup
+if command -v yarn &> /dev/null;
+then
+    yarn
+else
+    npm install
+fi
