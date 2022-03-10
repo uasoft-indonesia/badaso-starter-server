@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use ZipArchive;
 
 class BashController extends Controller
 {
@@ -19,7 +20,11 @@ class BashController extends Controller
         $laravel_version = $request->get('laravel-version', '8.0');
         $badaso_version = $request->get('badaso-version', '2.0');
 
-        $bash = file_get_contents(base_path(".badaso-starter/starter.stub"));
+        // $starter = base_path(".badaso-starter/starter") ;
+        // exec("zip {$starter}.zip {$starter}");
+
+        $bash_stub = base_path(".badaso-starter/starter.stub") ;
+        $bash = file_get_contents($bash_stub);
         $bash = str_replace([
             "{{laravel-version}}",
             "{{project-name}}",
