@@ -15,15 +15,34 @@ class BashController extends Controller
         ]);
     }
 
+    private function folderToZip($folder, &$zipFile, $exclusiveLength)
+    {
+        $handle = opendir($folder);
+        while (false !== $f = readdir($handle)) {
+            if ($f != '.' && $f != '..') {
+                $filePath = "$folder/$f";
+                // Remove prefix from file path before add to zip.
+                $localPath = substr($filePath, $exclusiveLength);
+                if (is_file($filePath)) {
+                    $zipFile->addFile($filePath, $localPath);
+                } elseif (is_dir($filePath)) {
+                    // Add sub-directory.
+                    $zipFile->addEmptyDir($localPath);
+                    $this->folderToZip($filePath, $zipFile, $exclusiveLength);
+                }
+            }
+        }
+        closedir($handle);
+    }
+
     public function createProject(Request $request, $project_name)
     {
         $laravel_version = $request->get('laravel-version', '8.0');
         $badaso_version = $request->get('badaso-version', '2.0');
 
-        // $starter = base_path(".badaso-starter/starter") ;
-        // exec("zip {$starter}.zip {$starter}");
+        $bash_stub = base_path(".badaso-starter/starter.stub");
 
-        $bash_stub = base_path(".badaso-starter/starter.stub") ;
+        $bash_stub = base_path(".badaso-starter/starter.stub");
         $bash = file_get_contents($bash_stub);
         $bash = str_replace([
             "{{laravel-version}}",
