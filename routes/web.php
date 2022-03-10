@@ -14,5 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/starter.zip', [BashController::class, 'starterZip']);
+Route::get('/', function(){
+    return view('welcome');
+});
+
 Route::get('/{project_name}', [BashController::class, 'createProject']);
