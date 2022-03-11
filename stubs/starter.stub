@@ -44,7 +44,6 @@ composer require laravel/sail --dev
 
 php artisan badaso:setup
 php artisan key:generate
-php artisan storage:link
 
 if command -v yarn &>/dev/null; then
     yarn
@@ -54,6 +53,7 @@ fi
 
 if docker info >/dev/null 2>&1; then
     docker-compose -f docker-compose.yml up -d
+    docker exec {{project-name}}-badaso-1 php artisan storage:link
     docker exec {{project-name}}-badaso-1 php artisan db:wipe
     docker exec {{project-name}}-badaso-1 php artisan migrate
     docker exec {{project-name}}-badaso-1 php artisan db:seed --class="Database\Seeders\Badaso\BadasoSeeder"
