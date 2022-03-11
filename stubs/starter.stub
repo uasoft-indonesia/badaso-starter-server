@@ -50,5 +50,5 @@ else
 fi
 
 if docker info >/dev/null 2>&1; then
-    docker-compose -f docker-compose up -d
+    docker-compose -f docker-compose.yml up -d
 fi
