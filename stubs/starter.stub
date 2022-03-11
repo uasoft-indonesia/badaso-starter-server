@@ -44,6 +44,7 @@ composer require laravel/sail --dev
 
 php artisan badaso:setup
 php artisan key:generate
+php artisan storage:link
 
 if command -v yarn &>/dev/null; then
     yarn
