@@ -28,7 +28,7 @@ curl {{badaso-starter-url}}/docker/php.ini >docker/8.1/php.ini
 curl {{badaso-starter-url}}/docker/start-container >docker/8.1/start-container
 curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf
 
-curl {{badaso-starter-url}}/views/welcome.blade.php >resource/views/welcome.blade.php
+curl {{badaso-starter-url}}/views/welcome.blade.php >resources/views/welcome.blade.php
 
 if docker info >/dev/null 2>&1; then
     curl {{badaso-starter-url}}/.env.example.docker >.env
