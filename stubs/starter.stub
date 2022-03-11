@@ -35,7 +35,7 @@ if docker info >/dev/null 2>&1; then
 fi
 
 curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
-curl {{badaso-starter-url}}/.gitpod >.gitpod
+curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
 curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
 
 composer require badaso/core:^{{badaso-version}}
