@@ -16,6 +16,12 @@ then
     exit
 fi
 
+if ! command -v npm &> /dev/null;
+then
+    echo "npm command not found"
+    exit
+fi
+
 composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
 
 cd {{project-name}}
