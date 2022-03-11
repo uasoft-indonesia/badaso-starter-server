@@ -48,6 +48,7 @@ class BashController extends Controller
         $bash_stub = base_path("stubs/env.example.docker.stub");
         $bash = file_get_contents($bash_stub);
 
+        $project_name = str_replace(["-", " "], "", $project_name);
         $bash = str_replace("{{project-name}}", $project_name, $bash);
 
         return response($bash, 200, [
