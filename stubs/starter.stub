@@ -23,10 +23,10 @@ composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
 cd {{project-name}}
 
 mkdir -p docker/8.1
-curl {{badaso-starter-url}}/docker/8.1/Dockerfile >docker/Dockerfile
-curl {{badaso-starter-url}}/docker/8.1/php.ini >docker/php.ini
-curl {{badaso-starter-url}}/docker/8.1/start-container >docker/start-container
-curl {{badaso-starter-url}}/docker/8.1/supervisord.conf >docker/supervisord.conf
+curl {{badaso-starter-url}}/docker/8.1/Dockerfile >docker/8.1/Dockerfile
+curl {{badaso-starter-url}}/docker/8.1/php.ini >docker/8.1/php.ini
+curl {{badaso-starter-url}}/docker/8.1/start-container >docker/8.1/start-container
+curl {{badaso-starter-url}}/docker/8.1/supervisord.conf >docker/8.1/supervisord.conf
 
 curl {{badaso-starter-url}}/views/welcome.blade.php >resource/views/welcome.blade.php
 
