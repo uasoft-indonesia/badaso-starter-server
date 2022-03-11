@@ -1,0 +1,62 @@
+if ! command -v composer &>/dev/null; then
+    echo "composer command not found"
+    exit
+fi
+
+if ! command -v curl &>/dev/null; then
+    echo "curl command not found"
+    exit
+fi
+
+if ! command -v composer &>/dev/null; then
+    echo "composer command not found"
+    exit
+fi
+
+if ! command -v npm &>/dev/null; then
+    echo "npm command not found"
+    exit
+fi
+
+composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
+
+cd {{project-name}}
+
+mkdir -p docker/8.1
+curl {{badaso-starter-url}}/docker/Dockerfile >docker/8.1/Dockerfile
+curl {{badaso-starter-url}}/docker/php.ini >docker/8.1/php.ini
+curl {{badaso-starter-url}}/docker/start-container >docker/8.1/start-container
+curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf
+
+curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
+
+if docker info >/dev/null 2>&1; then
+    curl {{badaso-starter-url}}/.env.example.docker >.env
+fi
+
+curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
+curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
+curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
+
+composer require badaso/core:^{{badaso-version}}
+composer require laravel/octane
+composer require laravel/sail --dev
+
+php artisan badaso:setup
+php artisan key:generate
+
+if command -v yarn &>/dev/null; then
+    yarn
+else
+    npm install
+fi
+
+if docker info >/dev/null 2>&1; then
+    docker-compose -f docker-compose.yml up -d
+    docker exec {{project-name}}-badaso-1 php artisan storage:link
+    docker exec {{project-name}}-badaso-1 php artisan db:wipe
+    docker exec {{project-name}}-badaso-1 php artisan migrate
+    docker exec {{project-name}}-badaso-1 php artisan db:seed --class="Database\Seeders\Badaso\BadasoSeeder"
+    docker exec {{project-name}}-badaso-1 php artisan badaso:admin admin@admin.com --name=admin --username=admin --password=admin --confirm_password=admin --create
+    docker exec {{project-name}}-badaso-1 yarn prod
+fi
