@@ -31,4 +31,27 @@ class BashController extends Controller
             'Content-Type' => 'text/plain'
         ]);
     }
+
+
+    public function createDockerComposer(Request $request, $project_name){
+        $bash_stub = base_path("stubs/docker-compose.stub");
+        $bash = file_get_contents($bash_stub);
+
+        $bash = str_replace("{{project-name}}", $project_name, $bash);
+
+        return response($bash, 200, [
+            'Content-Type' => 'text/plain'
+        ]);
+    }
+
+    public function createEnvExampleDocker(Request $request, $project_name){
+        $bash_stub = base_path("stubs/env.example.docker.stub");
+        $bash = file_get_contents($bash_stub);
+
+        $bash = str_replace("{{project-name}}", $project_name, $bash);
+
+        return response($bash, 200, [
+            'Content-Type' => 'text/plain'
+        ]);
+    }
 }

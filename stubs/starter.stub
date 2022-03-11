@@ -31,12 +31,12 @@ curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf
 curl {{badaso-starter-url}}/views/welcome.blade.php >resources/views/welcome.blade.php
 
 if docker info >/dev/null 2>&1; then
-    curl {{badaso-starter-url}}/.env.example.docker >.env
+    curl {{badaso-starter-url}}-overwrite/.env.example.docker/{{project-name}} >.env
 fi
 
 curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
 curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
-curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
+curl {{badaso-starter-url}}-overwrite/docker-compose.yml/{{project-name}} >docker-compose.yml
 
 composer require badaso/core:^{{badaso-version}}
 composer require laravel/octane
