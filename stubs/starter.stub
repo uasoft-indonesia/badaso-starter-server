@@ -1,23 +1,19 @@
-if ! command -v composer &> /dev/null;
-then
+if ! command -v composer &>/dev/null; then
     echo "composer command not found"
     exit
 fi
 
-if ! command -v curl &> /dev/null;
-then
+if ! command -v curl &>/dev/null; then
     echo "curl command not found"
     exit
 fi
 
-if ! command -v composer &> /dev/null;
-then
+if ! command -v composer &>/dev/null; then
     echo "composer command not found"
     exit
 fi
 
-if ! command -v npm &> /dev/null;
-then
+if ! command -v npm &>/dev/null; then
     echo "npm command not found"
     exit
 fi
@@ -27,30 +23,32 @@ composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
 cd {{project-name}}
 
 mkdir -p docker
-curl {{badaso-starter-url}}/docker/Dockerfile > docker/Dockerfile
-curl {{badaso-starter-url}}/docker/php.ini > docker/php.ini
-curl {{badaso-starter-url}}/docker/start-container > docker/start-container
-curl {{badaso-starter-url}}/docker/supervisord.conf > docker/supervisord.conf
+curl {{badaso-starter-url}}/docker/Dockerfile >docker/Dockerfile
+curl {{badaso-starter-url}}/docker/php.ini >docker/php.ini
+curl {{badaso-starter-url}}/docker/start-container >docker/start-container
+curl {{badaso-starter-url}}/docker/supervisord.conf >docker/supervisord.conf
 
-curl {{badaso-starter-url}}/views/welcome.blade.php > resource/views/welcome.blade.php
+curl {{badaso-starter-url}}/views/welcome.blade.php >resource/views/welcome.blade.php
 
-docker info > /dev/null 2>&1
-if ![ $? -ne 0 ]; then
-    curl {{badaso-starter-url}}/.env.example.docker > .env
+if docker info >/dev/null 2>&1; then
+    curl {{badaso-starter-url}}/.env.example.docker >.env
 fi
 
-curl {{badaso-starter-url}}/.gitpod.Dockerfile > .gitpod.Dockerfile
-curl {{badaso-starter-url}}/.gitpod > .gitpod
-curl {{badaso-starter-url}}/docker-compose.yml > docker-compose.yml
+curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
+curl {{badaso-starter-url}}/.gitpod >.gitpod
+curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
 
 composer require badaso/core:^{{badaso-version}}
 composer require laravel/octane
 composer require laravel/sail --dev
 
 php artisan badaso:setup
-if command -v yarn &> /dev/null;
-then
+if command -v yarn &>/dev/null; then
     yarn
 else
     npm install
+fi
+
+if docker info >/dev/null 2>&1; then
+    docker-compose -f docker-compose up -d
 fi
