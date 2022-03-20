@@ -33,7 +33,7 @@ class BashController extends Controller
     }
 
 
-    public function createDockerComposer(Request $request, $project_name){
+    public function createDockerCompose(Request $request, $project_name){
         $bash_stub = base_path("stubs/docker-compose.stub");
         $bash = file_get_contents($bash_stub);
 

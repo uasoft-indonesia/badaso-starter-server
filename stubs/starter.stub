@@ -1,62 +1,81 @@
-if ! command -v composer &>/dev/null; then
-    echo "composer command not found"
-    exit
-fi
+docker info > /dev/null 2>&1
 
-if ! command -v curl &>/dev/null; then
-    echo "curl command not found"
-    exit
-fi
+if [ $? -ne 0 ]; then
+    echo "Running without docker"
 
-if ! command -v composer &>/dev/null; then
-    echo "composer command not found"
-    exit
-fi
+    if ! command -v composer &>/dev/null; then
+        echo "composer command not found"
+        exit
+    fi
 
-if ! command -v npm &>/dev/null; then
-    echo "npm command not found"
-    exit
-fi
+    if ! command -v npm &>/dev/null; then
+        echo "npm command not found"
+        exit
+    fi
 
-composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
+    composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
 
-cd {{project-name}}
+    cd {{project-name}}
 
-mkdir -p docker/8.1
-curl {{badaso-starter-url}}/docker/Dockerfile >docker/8.1/Dockerfile
-curl {{badaso-starter-url}}/docker/php.ini >docker/8.1/php.ini
-curl {{badaso-starter-url}}/docker/start-container >docker/8.1/start-container
-curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf
+    mkdir -p docker/8.1
+    curl {{badaso-starter-url}}/docker/Dockerfile >docker/8.1/Dockerfile
+    curl {{badaso-starter-url}}/docker/php.ini >docker/8.1/php.ini
+    curl {{badaso-starter-url}}/docker/start-container >docker/8.1/start-container
+    curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf
+    curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
+    curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
+    curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
+    curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
 
-curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
+    composer require badaso/core:^{{badaso-version}}
+    composer require laravel/octane
+    composer require laravel/sail --dev
 
-if docker info >/dev/null 2>&1; then
-    curl {{badaso-starter-url}}/.env.example.docker >.env
-fi
+    php artisan badaso:setup
+    php artisan key:generate
 
-curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
-curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
-curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
-
-composer require badaso/core:^{{badaso-version}}
-composer require laravel/octane
-composer require laravel/sail --dev
-
-php artisan badaso:setup
-php artisan key:generate
-
-if command -v yarn &>/dev/null; then
-    yarn
+    if command -v yarn &>/dev/null; then
+        yarn
+    else
+        npm install
+    fi
 else
-    npm install
-fi
+    echo "Running with docker"
+    
+    docker run --rm \
+        -v "$(pwd)":/opt \
+        -w /opt \
+        laravelsail/php81-composer:latest \
+        bash -c "composer create-project laravel/laravel:^{{laravel-version}} {{project-name}} \
+        && cd {{project-name}} \
+        && mkdir -p docker/8.1 \
+        && curl {{badaso-starter-url}}/docker/Dockerfile >docker/8.1/Dockerfile \
+        && curl {{badaso-starter-url}}/docker/php.ini >docker/8.1/php.ini \
+        && curl {{badaso-starter-url}}/docker/start-container >docker/8.1/start-container \
+        && curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf \
+        && curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php \
+        && curl {{badaso-starter-url}}/.env.example.docker >.env \
+        && curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile \
+        && curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml \
+        && curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml"
+    
+    cd {{project-name}}
 
-if docker info >/dev/null 2>&1; then
-    docker-compose -f docker-compose.yml up -d
-    docker exec {{project-name}}-badaso-1 php artisan storage:link
-    docker exec {{project-name}}-badaso-1 php artisan db:wipe
-    docker exec {{project-name}}-badaso-1 php artisan migrate
-    docker exec {{project-name}}-badaso-1 php artisan db:seed --class="Database\Seeders\Badaso\BadasoSeeder"
-    docker exec {{project-name}}-badaso-1 php artisan badaso:admin admin@admin.com --name=admin --username=admin --password=admin --confirm_password=admin --create
-    docker exec {{project-name}}-badaso-1 yarn prod
+    CYAN='\033[0;36m'
+    LIGHT_CYAN='\033[1;36m'
+    WHITE='\033[1;37m'
+    NC='\033[0m'
+
+    echo ""
+
+    if sudo -n true 2>/dev/null; then
+        sudo chown -R $USER: .
+        echo -e "${WHITE}Get started with:${NC} cd asdasd && ./vendor/bin/sail up"
+    else
+        echo -e "${WHITE}Please provide your password so we can make some final adjustments to your application's permissions.${NC}"
+        echo ""
+        sudo chown -R $USER: .
+        echo ""
+        echo -e "${WHITE}Thank you! We hope you build something incredible. Dive in with:${NC} cd asdasd && ./vendor/bin/sail up"
+    fi
 fi

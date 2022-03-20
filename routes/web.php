@@ -21,6 +21,6 @@ Route::get('/', function () {
 Route::get('/{project_name}', [BashController::class, 'createProject']);
 
 Route::group(['prefix' => 'badaso-starter-overwrite'], function () {
-    Route::get('/docker-compose.yml/{project_name}', [BashController::class, 'createDockerComposer']);
+    Route::get('/docker-compose.yml/{project_name}', [BashController::class, 'createDockerCompose']);
     Route::get('/.env.example.docker/{project_name}', [BashController::class, 'createEnvExampleDocker']);
 });
