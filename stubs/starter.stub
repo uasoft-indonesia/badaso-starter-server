@@ -13,35 +13,51 @@ if [ $? -ne 0 ]; then
         exit
     fi
 
-    composer create-project laravel/laravel:^{{laravel-version}} {{project-name}}
+    composer create-project laravel/laravel {{project-name}}
 
     cd {{project-name}}
 
-    composer require badaso/core:^{{badaso-version}}
+    composer require badaso/core
+    composer require laravel/octane
     php artisan badaso:setup
     php artisan storage:link
     php artisan key:generate
-    composer require laravel/octane
+    php artisan sail:install --with=mysql,redis
+    php artisan sail:publish
     
+    # .env adjustments
     sed -i 's,APP_URL=http://localhost,APP_URL=http://localhost:8000,g' .env
     sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
     sed -i 's/FILESYSTEM_DRIVER=local/FILESYSTEM_DRIVER=public/g' .env
+
+    # supervisord adjustments
+    sed -i 's/serve/octane:start --server=swoole/g' docker/8.1/supervisord.conf
+    sed -i 's/80/8000/g' docker/8.1/supervisord.conf
+
+    # docker compose adjustments
+    sed -i 's,./vendor/laravel/sail/runtimes/8.1,./docker/8.1,g' docker-compose.yml
+    sed -i 's/laravel.test/badaso/g' docker-compose.yml
+    sed -i 's/80/8000/g' docker-compose.yml
+    sed -i 's,sail-8.1/app,badaso,g' docker-compose.yml
+
+    # dockerfile adjustments
+    sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
+    sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
+    sed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
+    sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile
+
+    rm -rf docker/7.4
+    rm -rf docker/8.0
+
+    curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
+    curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
+    curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
 
     if command -v yarn &>/dev/null; then
         yarn && yarn dev
     else
         npm install && npm run dev
     fi
-
-    mkdir -p docker/8.1
-    curl {{badaso-starter-url}}/docker/Dockerfile >docker/8.1/Dockerfile
-    curl {{badaso-starter-url}}/docker/php.ini >docker/8.1/php.ini
-    curl {{badaso-starter-url}}/docker/start-container >docker/8.1/start-container
-    curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf
-    curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
-    curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
-    curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
-    curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
 
     echo ""
     echo -e "${WHITE}Badaso installation is successfully, ${NC}but you need to configure the database first, then migrate and seed to use badaso."
@@ -53,16 +69,16 @@ else
     docker run --rm \
         -v "$(pwd)":/opt \
         -w /opt \
-        laravelsail/php80-composer:latest \
-        && apt-get install -y php8.0-common \ 
-        bash -c "composer create-project laravel/laravel:^{{laravel-version}} {{project-name}} \
+        laravelsail/php81-composer:latest \
+        bash -c "composer create-project laravel/laravel {{project-name}} \
         && cd {{project-name}} \
-        && composer require badaso/core:^{{badaso-version}} \
+        && composer require badaso/core \
+        && composer require laravel/octane \
         && php artisan badaso:setup \
         && php artisan storage:link \
         && php artisan key:generate \
-        && composer require laravel/octane \
-        && mkdir -p docker/8.1 \
+        && php artisan sail:install --with=mysql,redis \
+        && php artisan sail:publish \
         && yarn \
         && yarn dev"
     
@@ -76,15 +92,33 @@ else
         sudo chown -R $USER: .
     fi
 
-    curl {{badaso-starter-url}}/docker/Dockerfile >docker/8.1/Dockerfile
-    curl {{badaso-starter-url}}/docker/php.ini >docker/8.1/php.ini
-    curl {{badaso-starter-url}}/docker/start-container >docker/8.1/start-container
-    curl {{badaso-starter-url}}/docker/supervisord.conf >docker/8.1/supervisord.conf
+    # .env adjustments
+    sed -i 's,APP_URL=http://localhost,APP_URL=http://localhost:8000,g' .env
+    sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
+    sed -i 's/FILESYSTEM_DRIVER=local/FILESYSTEM_DRIVER=public/g' .env
+
+    # supervisord adjustments
+    sed -i 's/serve/octane:start --server=swoole/g' docker/8.1/supervisord.conf
+    sed -i 's/80/8000/g' docker/8.1/supervisord.conf
+
+    # docker compose adjustments
+    sed -i 's,./vendor/laravel/sail/runtimes/8.1,./docker/8.1,g' docker-compose.yml
+    sed -i 's/laravel.test/badaso/g' docker-compose.yml
+    sed -i 's/80/8000/g' docker-compose.yml
+    sed -i 's,sail-8.1/app,badaso,g' docker-compose.yml
+
+    # dockerfile adjustments
+    sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
+    sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
+    sed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
+    sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile
+
+    rm -rf docker/7.4
+    rm -rf docker/8.0
+
     curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
-    curl {{badaso-starter-url}}/.env.example.docker >.env
     curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
     curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
-    curl {{badaso-starter-url}}/docker-compose.yml >docker-compose.yml
 
     sudo chown -R $USER: .
     echo ""
