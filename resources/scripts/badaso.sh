@@ -13,18 +13,18 @@ if [ $? -ne 0 ]; then
         exit
     fi
 
-    composer create-project laravel/laravel {{project-name}}
+    composer create-project laravel/laravel project
 
-    cd {{project-name}}
+    cd project
 
     composer require badaso/core
     php artisan badaso:setup
     php artisan storage:link
     php artisan key:generate
 
-    curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
-    curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
-    curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
+    curl {{ server_url }}/badaso-starter/views/welcome.blade >resources/views/welcome.blade.php
+    curl {{ server_url }}/badaso-starter/.gitpod.Dockerfile >.gitpod.Dockerfile
+    curl {{ server_url }}/badaso-starter/.gitpod.yml >.gitpod.yml
 
     if command -v yarn &>/dev/null; then
         yarn && yarn dev
@@ -44,8 +44,8 @@ else
         -w /opt \
         laravelsail/php81-composer:latest \
         apt-get install -y php8.1-common \ 
-        bash -c "composer create-project laravel/laravel {{project-name}} \
-        && cd {{project-name}} \
+        bash -c "composer create-project laravel/laravel project \
+        && cd project \
         && composer require badaso/core \
         && composer require laravel/octane \
         && php artisan badaso:setup \
@@ -53,7 +53,7 @@ else
         && php artisan sail:install --with=mysql,redis \
         && php artisan sail:publish"
     
-    cd {{project-name}}
+    cd project
 
     if sudo -n true 2>/dev/null; then
         sudo chown -R $USER: .
@@ -91,9 +91,9 @@ else
     rm -rf docker/8.0
 
     # add badaso welcome page & gitpod config
-    curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
-    curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
-    curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
+    curl {{ server_url }}/badaso-starter/views/welcome.blade >resources/views/welcome.blade.php
+    curl {{ server_url }}/badaso-starter/.gitpod.Dockerfile >.gitpod.Dockerfile
+    curl {{ server_url }}/badaso-starter/.gitpod.yml >.gitpod.yml
 
     # run container
     vendor/bin/sail up -d

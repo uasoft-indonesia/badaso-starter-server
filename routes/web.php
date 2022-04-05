@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\BashController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,13 +16,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', 'https://badaso-docs.uatech.co.id', 302);
 
-Route::get('/{project_name}', [BashController::class, 'createProject']);
+Route::get('/{name}', function (Request $request, $name) {
+    try {
+        Validator::validate(['name' => $name], ['name' => 'string|alpha_dash']);
+    } catch (ValidationException $e) {
+        return response('Invalid site name. Please only use alpha-numeric characters, dashes, and underscores.', 400);
+    }
 
-Route::group(['prefix' => 'badaso-starter-overwrite'], function () {
-    Route::get('/docker-compose.yml/{project_name}', [BashController::class, 'createDockerCompose']);
-    Route::get('/.env.example.docker/{project_name}', [BashController::class, 'createEnvExampleDocker']);
+    $devcontainer = $request->has('devcontainer') ? '--devcontainer' : '';
+
+    $server_url = env('APP_URL');
+
+    $script = str_replace(
+        ['{{ name }}', '{{ devcontainer }}', '{{ server_url }}'],
+        [$name, $devcontainer, $server_url],
+        file_get_contents(resource_path('scripts/badaso.sh'))
+    );
+
+    return response($script, 200, ['Content-Type' => 'text/plain']);
 });
