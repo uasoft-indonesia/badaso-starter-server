@@ -49,12 +49,9 @@ else
         && composer require badaso/core \
         && composer require laravel/octane \
         && php artisan badaso:setup \
-        && php artisan storage:link \
         && php artisan key:generate \
         && php artisan sail:install --with=mysql,redis \
-        && php artisan sail:publish \
-        && yarn \
-        && yarn dev"
+        && php artisan sail:publish"
     
     cd {{project-name}}
 
@@ -68,6 +65,8 @@ else
 
     # .env adjustments
     sed -i 's,APP_URL=http://localhost,APP_URL=http://localhost:8000,g' .env
+    sed -i '/APP_URL=http:\/\/localhost:8000/i APP_PORT=8000' .env
+    sed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
     sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
     sed -i 's/FILESYSTEM_DRIVER=local/FILESYSTEM_DRIVER=public/g' .env
 
@@ -94,9 +93,27 @@ else
     curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
     curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
 
+    # run container
+    vendor/bin/sail up -d
+    
+    # waiting for container fully available
+    echo -e "Waiting for container fully available"
+    sleep 10
+
+    # database adjustment for badaso
+    vendor/bin/sail artisan migrate
+    vendor/bin/sail artisan db:seed --class='Database\Seeders\Badaso\BadasoSeeder'
+    vendor/bin/sail artisan badaso:admin admin@admin.com --create --name=Admin --username=admin --password=123456 --confirm_password=123456
+
+    # build assets
+    vendor/bin/sail artisan storage:link
+    vendor/bin/sail yarn
+    vendor/bin/sail yarn dev
+
     sudo chown -R $USER: .
     echo ""
-    echo -e "${WHITE}Badaso installation is successfully, ${NC}but you need to configure the database first, then migrate and seed to use badaso."
+    echo -e "Badaso installation is successfull and running on http://localhost:8000"
     echo ""
-    echo -e "Read more https://badaso-docs.uatech.co.id/getting-started/installation#next-setup-for-fresh-project-or-existing-project"
+    echo -e "Email : admin@admin.com"
+    echo -e "Pass  : 123456"
 fi
