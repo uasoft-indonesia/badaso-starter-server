@@ -98,14 +98,31 @@ else
     # run container
     vendor/bin/sail up -d
     
-    # waiting for container fully available
-    echo -e "Waiting for container fully available"
-    sleep 20
+    # waiting for database container fully available
+    echo "Waiting for database container fully available"
+    sleep 5
 
-    # database adjustment for badaso
-    vendor/bin/sail artisan migrate
-    vendor/bin/sail artisan db:seed --class='Database\Seeders\Badaso\BadasoSeeder'
-    vendor/bin/sail artisan badaso:admin admin@admin.com --create --name=Admin --username=admin --password=123456 --confirm_password=123456
+    check_database=1
+
+    for i in {1..5}
+    do
+        if [[ $(vendor/bin/sail artisan tinker --execute="echo DB::connection()->getDatabaseName();") ==  *"laravel"* ]];then
+            # database adjustment for badaso
+            vendor/bin/sail artisan migrate
+            vendor/bin/sail artisan db:seed --class='Database\Seeders\Badaso\BadasoSeeder'
+            vendor/bin/sail artisan badaso:admin admin@admin.com --create --name=Admin --username=admin --password=123456 --confirm_password=123456
+            break
+        else
+            if [ $check_database == 5 ];
+            then
+                echo "Can't connect to database container, try manual later"
+            else
+                echo "Check database for ${check_database} times"
+                ((check_database++))
+                sleep 5
+            fi
+        fi
+    done
 
     # build assets
     vendor/bin/sail artisan storage:link
