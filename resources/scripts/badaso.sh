@@ -13,9 +13,9 @@ if [ $? -ne 0 ]; then
         exit
     fi
 
-    composer create-project laravel/laravel project
+    composer create-project laravel/laravel {{ name }}
 
-    cd project
+    cd {{ name }}
 
     composer require badaso/core
     php artisan badaso:setup
@@ -44,8 +44,8 @@ else
         -w /opt \
         laravelsail/php81-composer:latest \
         apt-get install -y php8.1-common \ 
-        bash -c "composer create-project laravel/laravel project \
-        && cd project \
+        bash -c "composer create-project laravel/laravel {{ name }} \
+        && cd {{ name }} \
         && composer require badaso/core \
         && composer require laravel/octane \
         && php artisan badaso:setup \
@@ -53,7 +53,7 @@ else
         && php artisan sail:install --with=mysql,redis \
         && php artisan sail:publish"
     
-    cd project
+    cd {{ name }}
 
     if sudo -n true 2>/dev/null; then
         sudo chown -R $USER: .
@@ -100,7 +100,7 @@ else
     
     # waiting for container fully available
     echo -e "Waiting for container fully available"
-    sleep 10
+    sleep 20
 
     # database adjustment for badaso
     vendor/bin/sail artisan migrate
