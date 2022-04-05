@@ -86,9 +86,11 @@ else
     sed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
     sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile
 
+    # remove unused dockerfile
     rm -rf docker/7.4
     rm -rf docker/8.0
 
+    # add badaso welcome page & gitpod config
     curl {{badaso-starter-url}}/views/welcome.blade >resources/views/welcome.blade.php
     curl {{badaso-starter-url}}/.gitpod.Dockerfile >.gitpod.Dockerfile
     curl {{badaso-starter-url}}/.gitpod.yml >.gitpod.yml
