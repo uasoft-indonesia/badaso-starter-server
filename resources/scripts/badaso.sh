@@ -69,6 +69,7 @@ else
     sed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
     sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
     sed -i 's/FILESYSTEM_DRIVER=local/FILESYSTEM_DRIVER=public/g' .env
+    mv .env .env.example
 
     # supervisord adjustments
     sed -i 's/serve/octane:start --server=swoole/g' docker/8.1/supervisord.conf
