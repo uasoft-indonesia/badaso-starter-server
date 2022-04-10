@@ -115,7 +115,10 @@ else
         else
             if [ $check_database == 5 ];
             then
-                echo "Can't connect to database container, try manual later"
+                echo "Can't connect to database container, try manual later by running these commands :"
+                echo "cd {{ name }}"
+                echo "vendor/bin/sail artisan migrate"
+                echo 'vendor/bin/sail artisan db:seed --class="Database\Seeders\Badaso\BadasoSeeder"'
             else
                 echo "Check database for ${check_database} times"
                 ((check_database++))
