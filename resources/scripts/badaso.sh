@@ -69,6 +69,8 @@ else
     sed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
     sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
     sed -i 's/FILESYSTEM_DRIVER=local/FILESYSTEM_DRIVER=public/g' .env
+    sed -i 's/DB_DATABASE=laravel/DB_DATABASE=badaso/g' .env
+    
     mv .env .env.example
 
     # supervisord adjustments
