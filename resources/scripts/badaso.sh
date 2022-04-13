@@ -25,6 +25,7 @@ if [ $? -ne 0 ]; then
     curl {{ server_url }}/badaso-starter/views/welcome.blade >resources/views/welcome.blade.php
     curl {{ server_url }}/badaso-starter/.gitpod.Dockerfile >.gitpod.Dockerfile
     curl {{ server_url }}/badaso-starter/.gitpod.yml >.gitpod.yml
+    curl {{ server_url }}/badaso-starter/README.md >README.md
 
     if command -v yarn &>/dev/null; then
         yarn && yarn dev
@@ -64,14 +65,17 @@ else
     fi
 
     # .env adjustments
-    sed -i 's,APP_URL=http://localhost,APP_URL=http://localhost:8000,g' .env
+    sed -i 's|APP_URL=http://localhost|APP_URL=http://localhost:8000|g' .env
     sed -i '/APP_URL=http:\/\/localhost:8000/i APP_PORT=8000' .env
     sed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
     sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
-    sed -i 's/FILESYSTEM_DRIVER=local/FILESYSTEM_DRIVER=public/g' .env
+    sed -i 's/FILESYSTEM_DISK=local/FILESYSTEM_DISK=public/g' .env
     sed -i 's/DB_DATABASE=laravel/DB_DATABASE=badaso/g' .env
-    
     mv .env .env.example
+
+    # composer.json adjustment
+    sed -i 's|laravel/laravel|badaso/starter|g' composer.json
+    sed -i 's/The Laravel Framework/Badaso starter project/g' composer.json
 
     # supervisord adjustments
     sed -i 's/serve/octane:start --server=swoole/g' docker/8.1/supervisord.conf
@@ -97,6 +101,7 @@ else
     curl {{ server_url }}/badaso-starter/views/welcome.blade >resources/views/welcome.blade.php
     curl {{ server_url }}/badaso-starter/.gitpod.Dockerfile >.gitpod.Dockerfile
     curl {{ server_url }}/badaso-starter/.gitpod.yml >.gitpod.yml
+    curl {{ server_url }}/badaso-starter/README.md >README.md
 
     # run container
     vendor/bin/sail up -d
