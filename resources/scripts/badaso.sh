@@ -71,7 +71,7 @@ else
     sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
     sed -i 's/FILESYSTEM_DISK=local/FILESYSTEM_DISK=public/g' .env
     sed -i 's/DB_DATABASE=laravel/DB_DATABASE=badaso/g' .env
-    mv .env .env.example
+    cp .env .env.example
 
     # composer.json adjustment
     sed -i 's|laravel/laravel|badaso/starter|g' composer.json
@@ -118,7 +118,7 @@ else
             # database adjustment for badaso
             vendor/bin/sail artisan migrate
             vendor/bin/sail artisan db:seed --class='Database\Seeders\Badaso\BadasoSeeder'
-            vendor/bin/sail artisan badaso:admin admin@admin.com --create --name=Admin --username=admin --password=123456 --confirm_password=123456
+            vendor/bin/sail artisan badaso:admin {{ account_email }} --create --name={{ account_name }} --username={{ account_username }} --password={{ account_password }} --confirm_password={{ account_password }}
             break
         else
             if [ $check_database == 5 ];
@@ -128,6 +128,7 @@ else
                 echo "cd {{ name }}"
                 echo "vendor/bin/sail artisan migrate"
                 echo 'vendor/bin/sail artisan db:seed --class="Database\Seeders\Badaso\BadasoSeeder"'
+                echo "vendor/bin/sail artisan badaso:admin {{ account_email }} --create --name={{ account_name }} --username={{ account_username }} --password={{ account_password }} --confirm_password={{ account_password }}"
                 echo ""
             else
                 echo "Check database for ${check_database} times"
@@ -146,6 +147,6 @@ else
     echo ""
     echo -e "Badaso installation is successfull and running on http://localhost:8000"
     echo ""
-    echo -e "Email : admin@admin.com"
-    echo -e "Pass  : 123456"
+    echo -e "Email : {{ account_email }}"
+    echo -e "Pass  : {{ account_password }}"
 fi

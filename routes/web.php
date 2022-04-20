@@ -25,13 +25,17 @@ Route::get('/{name}', function (Request $request, $name) {
         return response('Invalid site name. Please only use alpha-numeric characters, dashes, and underscores.', 400);
     }
 
+    $account_name = $request->query('account_name', 'Admin');
+    $account_username = $request->query('account_username', "admin");
+    $account_password = $request->query('account_password', "badaso");
+    $account_email = $request->query('account_email', "admin@admin.com");
     $devcontainer = $request->has('devcontainer') ? '--devcontainer' : '';
 
     $server_url = env('APP_URL');
 
     $script = str_replace(
-        ['{{ name }}', '{{ devcontainer }}', '{{ server_url }}'],
-        [$name, $devcontainer, $server_url],
+        ['{{ name }}', '{{ account_name }}', '{{ account_username }}', '{{ account_email }}', '{{ account_password }}', '{{ devcontainer }}', '{{ server_url }}'],
+        [$name, $account_name, $account_username, $account_email, $account_password, $devcontainer, $server_url],
         file_get_contents(resource_path('scripts/badaso.sh'))
     );
 
