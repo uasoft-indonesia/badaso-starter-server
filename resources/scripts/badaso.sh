@@ -82,16 +82,16 @@ else
     sed -i 's/80/8000/g' docker/8.1/supervisord.conf
 
     # docker compose adjustments
-    sed -i 's,./vendor/laravel/sail/runtimes/8.1,./docker/8.1,g' docker-compose.yml
+    sed -i 's|./vendor/laravel/sail/runtimes/8.1|./docker/8.1|g' docker-compose.yml
     sed -i 's/laravel.test/badaso/g' docker-compose.yml
-    sed -i 's/80/8000/g' docker-compose.yml
-    sed -i 's,sail-8.1/app,badaso,g' docker-compose.yml
+    sed -i 's/{APP_PORT:-80}:80/{APP_PORT:-8000}:8000/g' docker-compose.yml
+    sed -i 's|sail-8.1/app|badaso|g' docker-compose.yml
 
     # dockerfile adjustments
     sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
     sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
     sed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
-    sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile
+    sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile 
 
     # remove unused dockerfile
     rm -rf docker/7.4
