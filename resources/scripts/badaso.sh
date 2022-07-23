@@ -43,9 +43,8 @@ else
     docker run --rm \
         -v "$(pwd)":/opt \
         -w /opt \
-        laravelsail/php81-composer:latest \
-        apt-get install -y php8.1-common \ 
-        bash -c "composer create-project laravel/laravel {{ name }} \
+        uasoft/badaso-starter:latest \
+        bash -c "composer create-project laravel/laravel:9.1.10 {{ name }} \
         && cd {{ name }} \
         && composer require badaso/core \
         && composer require laravel/octane \
