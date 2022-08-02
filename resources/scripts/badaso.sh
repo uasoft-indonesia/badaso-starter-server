@@ -63,34 +63,65 @@ else
         sudo chown -R $USER: .
     fi
 
-    # .env adjustments
-    sed -i 's|APP_URL=http://localhost|APP_URL=http://localhost:8000|g' .env
-    sed -i '/APP_URL=http:\/\/localhost:8000/i APP_PORT=8000' .env
-    sed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
-    sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
-    sed -i 's/FILESYSTEM_DISK=local/FILESYSTEM_DISK=public/g' .env
-    sed -i 's/DB_DATABASE=laravel/DB_DATABASE=badaso/g' .env
-    cp .env .env.example
+    if [[ "$OSTYPE" == "darwin"* ]]; then # Check if MacOS, please install gnu-sed on the mac to use this
+        # .env adjustments
+        gsed -i 's|APP_URL=http://localhost|APP_URL=http://localhost:8000|g' .env
+        gsed -i '/APP_URL=http:\/\/localhost:8000/i APP_PORT=8000' .env
+        gsed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
+        gsed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
+        gsed -i 's/FILESYSTEM_DISK=local/FILESYSTEM_DISK=public/g' .env
+        gsed -i 's/DB_DATABASE=laravel/DB_DATABASE=badaso/g' .env
+        cp .env .env.example
 
-    # composer.json adjustment
-    sed -i 's|laravel/laravel|badaso/starter|g' composer.json
-    sed -i 's/The Laravel Framework/Badaso starter project/g' composer.json
+        # composer.json adjustment
+        gsed -i 's|laravel/laravel|badaso/starter|g' composer.json
+        gsed -i 's/The Laravel Framework/Badaso starter project/g' composer.json
 
-    # supervisord adjustments
-    sed -i 's/serve/octane:start --server=swoole/g' docker/8.1/supervisord.conf
-    sed -i 's/80/8000/g' docker/8.1/supervisord.conf
+        # supervisord adjustments
+        gsed -i 's/serve/octane:start --server=swoole/g' docker/8.1/supervisord.conf
+        gsed -i 's/80/8000/g' docker/8.1/supervisord.conf
 
-    # docker compose adjustments
-    sed -i 's|./vendor/laravel/sail/runtimes/8.1|./docker/8.1|g' docker-compose.yml
-    sed -i 's/laravel.test/badaso/g' docker-compose.yml
-    sed -i 's/{APP_PORT:-80}:80/{APP_PORT:-8000}:8000/g' docker-compose.yml
-    sed -i 's|sail-8.1/app|badaso|g' docker-compose.yml
+        # docker compose adjustments
+        gsed -i 's|./vendor/laravel/sail/runtimes/8.1|./docker/8.1|g' docker-compose.yml
+        gsed -i 's/laravel.test/badaso/g' docker-compose.yml
+        gsed -i 's/{APP_PORT:-80}:80/{APP_PORT:-8000}:8000/g' docker-compose.yml
+        gsed -i 's|sail-8.1/app|badaso|g' docker-compose.yml
 
-    # dockerfile adjustments
-    sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
-    sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
-    sed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
-    sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile 
+        # dockerfile adjustments
+        gsed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
+        gsed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
+        gsed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
+        gsed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile 
+    else
+        # .env adjustments
+        sed -i 's|APP_URL=http://localhost|APP_URL=http://localhost:8000|g' .env
+        sed -i '/APP_URL=http:\/\/localhost:8000/i APP_PORT=8000' .env
+        sed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
+        sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
+        sed -i 's/FILESYSTEM_DISK=local/FILESYSTEM_DISK=public/g' .env
+        sed -i 's/DB_DATABASE=laravel/DB_DATABASE=badaso/g' .env
+        cp .env .env.example
+
+        # composer.json adjustment
+        sed -i 's|laravel/laravel|badaso/starter|g' composer.json
+        sed -i 's/The Laravel Framework/Badaso starter project/g' composer.json
+
+        # supervisord adjustments
+        sed -i 's/serve/octane:start --server=swoole/g' docker/8.1/supervisord.conf
+        sed -i 's/80/8000/g' docker/8.1/supervisord.conf
+
+        # docker compose adjustments
+        sed -i 's|./vendor/laravel/sail/runtimes/8.1|./docker/8.1|g' docker-compose.yml
+        sed -i 's/laravel.test/badaso/g' docker-compose.yml
+        sed -i 's/{APP_PORT:-80}:80/{APP_PORT:-8000}:8000/g' docker-compose.yml
+        sed -i 's|sail-8.1/app|badaso|g' docker-compose.yml
+
+        # dockerfile adjustments
+        sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
+        sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
+        sed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
+        sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile 
+    fi
 
     # remove unused dockerfile
     rm -rf docker/7.4
