@@ -144,7 +144,7 @@ else
 
     for i in {1..5}
     do
-        if [[ $(vendor/bin/sail artisan tinker --execute="echo DB::connection()->getDatabaseName();") ==  *"laravel"* ]];then
+        if [[ $(vendor/bin/sail artisan tinker --execute="echo DB::connection()->getDatabaseName();") ==  *"badaso"* ]];then
             # database adjustment for badaso
             vendor/bin/sail artisan migrate
             vendor/bin/sail artisan db:seed --class='Database\Seeders\Badaso\BadasoSeeder'
