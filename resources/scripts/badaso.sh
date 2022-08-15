@@ -13,7 +13,7 @@ if [ $? -ne 0 ]; then
         exit
     fi
 
-    composer create-project laravel/laravel {{ name }}
+    composer create-project laravel/laravel:9.1.10 {{ name }}
 
     cd {{ name }}
 
