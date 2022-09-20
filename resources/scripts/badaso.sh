@@ -13,7 +13,7 @@ if [ $? -ne 0 ]; then
         exit
     fi
 
-    composer create-project laravel/laravel {{ name }}
+    composer create-project laravel/laravel:9.1.10 {{ name }}
 
     cd {{ name }}
 
@@ -145,7 +145,7 @@ else
 
     for i in {1..5}
     do
-        if [[ $(vendor/bin/sail artisan tinker --execute="echo DB::connection()->getDatabaseName();") ==  *"laravel"* ]];then
+        if [[ $(vendor/bin/sail artisan tinker --execute="echo DB::connection()->getDatabaseName();") ==  *"badaso"* ]];then
             # database adjustment for badaso
             vendor/bin/sail artisan migrate
             vendor/bin/sail artisan db:seed --class='Database\Seeders\Badaso\BadasoSeeder'
