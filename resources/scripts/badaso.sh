@@ -50,6 +50,7 @@ else
         && composer require laravel/octane \
         && php artisan badaso:setup \
         && php artisan key:generate \
+        && php artisan jwt:secret --force \
         && php artisan sail:install --with=mysql,redis \
         && php artisan sail:publish"
     
