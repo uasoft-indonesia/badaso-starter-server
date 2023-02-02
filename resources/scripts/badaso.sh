@@ -13,7 +13,7 @@ if [ $? -ne 0 ]; then
         exit
     fi
 
-    composer create-project laravel/laravel:9.1.10 {{ name }}
+    composer create-project laravel/laravel:^8.1 {{ name }}
 
     cd {{ name }}
 
@@ -44,7 +44,7 @@ else
         -v "$(pwd)":/opt \
         -w /opt \
         uasoft/badaso-starter:latest \
-        bash -c "composer create-project laravel/laravel:9.1.10 {{ name }} \
+        bash -c "composer create-project laravel/laravel:^8.1 {{ name }} \
         && cd {{ name }} \
         && composer require badaso/core \
         && composer require laravel/octane \
@@ -83,10 +83,10 @@ else
         gsed -i 's/80/8000/g' docker/8.1/supervisord.conf
 
         # docker compose adjustments
-        gsed -i 's|./vendor/laravel/sail/runtimes/8.1|./docker/8.1|g' docker-compose.yml
+        gsed -i 's|./docker/8.2|./docker/8.1|g' docker-compose.yml
         gsed -i 's/laravel.test/badaso/g' docker-compose.yml
         gsed -i 's/{APP_PORT:-80}:80/{APP_PORT:-8000}:8000/g' docker-compose.yml
-        gsed -i 's|sail-8.1/app|badaso|g' docker-compose.yml
+        gsed -i 's|sail-8.2/app|badaso|g' docker-compose.yml
 
         # dockerfile adjustments
         gsed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
@@ -112,10 +112,10 @@ else
         sed -i 's/80/8000/g' docker/8.1/supervisord.conf
 
         # docker compose adjustments
-        sed -i 's|./vendor/laravel/sail/runtimes/8.1|./docker/8.1|g' docker-compose.yml
+        sed -i 's|./docker/8.2|./docker/8.1|g' docker-compose.yml
         sed -i 's/laravel.test/badaso/g' docker-compose.yml
         sed -i 's/{APP_PORT:-80}:80/{APP_PORT:-8000}:8000/g' docker-compose.yml
-        sed -i 's|sail-8.1/app|badaso|g' docker-compose.yml
+        sed -i 's|sail-8.2/app|badaso|g' docker-compose.yml
 
         # dockerfile adjustments
         sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
