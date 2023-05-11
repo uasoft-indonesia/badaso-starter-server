@@ -39,21 +39,21 @@ if [ $? -ne 0 ]; then
     echo -e "Read more https://badaso-docs.uatech.co.id/getting-started/installation#next-setup-for-fresh-project-or-existing-project"
 else
     echo "Running with docker"
-    
+
     docker run --rm \
         -v "$(pwd)":/opt \
         -w /opt \
         uasoft/badaso-starter:latest \
         bash -c "composer create-project laravel/laravel:^8.1 {{ name }} \
         && cd {{ name }} \
-        && composer require badaso/core \
+        && composer require badaso/core:dev-bug/v2/composer -W\
         && composer require laravel/octane \
         && php artisan badaso:setup \
         && php artisan key:generate \
         && php artisan jwt:secret --force \
         && php artisan sail:install --with=mysql,redis \
         && php artisan sail:publish"
-    
+
     cd {{ name }}
 
     if sudo -n true 2>/dev/null; then
@@ -92,7 +92,7 @@ else
         gsed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
         gsed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
         gsed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
-        gsed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile 
+        gsed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile
     else
         # .env adjustments
         sed -i 's|APP_URL=http://localhost|APP_URL=http://localhost:8000|g' .env
@@ -121,7 +121,7 @@ else
         sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/storage' docker/8.1/Dockerfile
         sed -i '/EXPOSE 8000/i RUN mkdir -p /var/www/html/public ' docker/8.1/Dockerfile
         sed -i '/EXPOSE 8000/i RUN chmod -R 777 /var/www/html/storage' docker/8.1/Dockerfile
-        sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile 
+        sed -i '/EXPOSE 8000/i RUN chmod -R 755 /var/www/html/public' docker/8.1/Dockerfile
     fi
 
     # remove unused dockerfile
@@ -136,7 +136,7 @@ else
 
     # run container
     vendor/bin/sail up -d
-    
+
     # waiting for database container fully available
     echo "Waiting for database container fully available"
     sleep 5
