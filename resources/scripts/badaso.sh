@@ -46,8 +46,7 @@ else
         uasoft/badaso-starter:latest \
         bash -c "composer create-project laravel/laravel:^8.1 {{ name }} \
         && cd {{ name }} \
-        && composer require badaso/core -W\
-        && composer require laravel/octane \
+        && composer require badaso/core -W \
         && php artisan badaso:setup \
         && php artisan key:generate \
         && php artisan jwt:secret --force \
