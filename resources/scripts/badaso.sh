@@ -138,7 +138,7 @@ else
     vendor/bin/sail up -d
 
     # waiting for database container fully available
-    echo "Waiting for database container fully available for 1 minute"
+    echo "Waiting for database container availability for 1 minute"
     sleep 60
 
     check_database=1
@@ -162,9 +162,9 @@ else
                 echo "vendor/bin/sail artisan badaso:admin {{ account_email }} --create --name={{ account_name }} --username={{ account_username }} --password={{ account_password }} --confirm_password={{ account_password }}"
                 echo ""
             else
-                echo "Check database for ${check_database} times"
+                echo "Check database availability for 1 minute for ${check_database} times"
                 ((check_database++))
-                sleep 5
+                sleep 60
             fi
         fi
     done
