@@ -41,17 +41,18 @@ else
     echo "Running with docker"
 
     docker run --rm \
+        --pull=always \
         -v "$(pwd)":/opt \
         -w /opt \
-        uasoft/badaso-starter:latest \
+        uasoft/badaso-starter:php81 \
         bash -c "composer create-project laravel/laravel:^8.1 {{ name }} \
         && cd {{ name }} \
-        && composer require badaso/core -W \
-        && php artisan badaso:setup \
-        && php artisan key:generate \
-        && php artisan jwt:secret --force \
-        && php artisan sail:install --with=mysql,redis \
-        && php artisan sail:publish"
+        && composer require badaso/core:2.9.11 -W \
+        && php ./artisan badaso:setup \
+        && php ./artisan key:generate \
+        && php ./artisan jwt:secret --force \
+        && php ./artisan sail:install --with=mysql,redis \
+        && php ./artisan sail:publish"
 
     cd {{ name }}
 
@@ -98,7 +99,7 @@ else
         sed -i '/APP_URL=http:\/\/localhost:8000/i APP_PORT=8000' .env
         sed -i '/APP_PORT=8000/i APP_SERVICE=badaso' .env
         sed -i 's/LOG_CHANNEL=stack/LOG_CHANNEL=daily/g' .env
-        sed -i 's/FILESYSTEM_DISK=local/FILESYSTEM_DISK=public/g' .env
+        sed -i 's/FILESYSTEM_DRIVER=local/FILESYSTEM_DRIVER=public/g' .env
         sed -i 's/DB_DATABASE=laravel/DB_DATABASE=badaso/g' .env
         cp .env .env.example
 
@@ -137,14 +138,14 @@ else
     vendor/bin/sail up -d
 
     # waiting for database container fully available
-    echo "Waiting for database container fully available"
-    sleep 5
+    echo "Waiting for database container fully available for 1 minute"
+    sleep 60
 
     check_database=1
 
     for i in {1..5}
     do
-        if [[ $(vendor/bin/sail artisan tinker --execute="echo DB::connection()->getDatabaseName();") ==  *"badaso"* ]];then
+        if [[ $(vendor/bin/sail artisan tinker --execute="echo DB::connection()->getDatabaseName();") ==  "badaso" ]];then
             # database adjustment for badaso
             vendor/bin/sail artisan migrate
             vendor/bin/sail artisan db:seed --class='Database\Seeders\Badaso\BadasoSeeder'
